@@ -93,7 +93,7 @@ fn obj_load( $file, $load_vertex_color )
     if $load_vertex_color
     {
         resize( $mdlCols, get_xsize($mdlCols), $mdlCols.size )
-		if ($mdlCols.size == 0 || $cols.size == 0) { remove( $mdlCols ) ; $mdlCols = -1 }
+        if ($mdlCols.size == 0 || $cols.size == 0) { remove( $mdlCols ) ; $mdlCols = -1 }
         remove( $cols )
     }
     $mdlVerts.cols = $mdlCols
