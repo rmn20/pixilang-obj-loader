@@ -44,14 +44,14 @@ fn obj_load( $file, $load_vertex_color )
     
     $verts = new( 3, $initial_size, FLOAT32 )
     $cols = -1
-    if $load_vertex_color  { $cols = new(3, $initial_size, INT8) }
+    if $load_vertex_color  { $cols = new(3, $initial_size, FLOAT32) }
     $uvs = new( 2, $initial_size, FLOAT32 )
     $norms = new( 3, $initial_size, FLOAT32 )
 
     //Init data arrays
     $mdlVerts = new( 3, $initial_size, FLOAT32 )
     $mdlCols = -1
-    if $load_vertex_color { $mdlCols = new(3, $initial_size, INT8) }
+    if $load_vertex_color { $mdlCols = new(3, $initial_size, FLOAT32) }
     $mdlUvs = new( 2, $initial_size, FLOAT32 )
     $mdlNorms = new( 3, $initial_size, FLOAT32 )
 
@@ -176,12 +176,12 @@ fn _objl_load_vertex( $line, $pos, $arr, $axes_count, $arr2, $axes_count2 )
         $axis = 0
         while( $axis < $axes_count2 && $pos < $line.len )
         {
-            $arr2[ $axis, $arr2.size - 1 ] = _objl_str2num( $line, $pos ) * 255
+            $arr2[ $axis, $arr2.size - 1 ] = _objl_str2num( $line, $pos )
             $pos = $line.str2num_end + 1
             $axis + 1
         }
         //if we dont have vertex colors
-        if( $axis < $axes_count2 ) { op_cn( OP_COPY, $arr2, 255, 0, $arr2.size - 1, $axes_count2, 1 ) }
+        if( $axis < $axes_count2 ) { op_cn( OP_COPY, $arr2, 1, 0, $arr2.size - 1, $axes_count2 - $axis, 1 ) }
     }
 }
 
