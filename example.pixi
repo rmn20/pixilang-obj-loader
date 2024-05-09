@@ -2,9 +2,6 @@ include "obj_loader.pixi"
 
 fn gl_callback($userdata)
 {
-    $t = (get_timer( 0 ) & 8191) / 8192
-    $t2 = $t * 360 * 2
-
     set_screen(GL_SCREEN) //Enable OpenGL drawing mode
     set_zbuf(GL_ZBUF)
 
@@ -12,8 +9,8 @@ fn gl_callback($userdata)
     clear_zbuf()
 
     t_set_camera(
-        -100, 150, -100,
-        -5, $t2, 0,
+        player[0], player[1] + 170, player[2],
+        player.rotX, player.rotY, 0,
         1, 
         20000,
         100
@@ -37,15 +34,62 @@ tex = -1
 obj = obj_load( "test2.obj", 1 ) ; tex = load( "tex2.png" )
 //obj = obj_load( "test_cube.obj" ) ; tex = load( "tex2.png" )
 
+player = new(3, 1, FLOAT)
+clean(player)
+
+player.rotX = 0
+player.rotY = 0
+
+keyboard = new(256, 1, INT8)
+clean(keyboard)
+
 set_gl_callback(gl_callback, 0) 
 
 while 1
 {
-    while(get_event()) { if EVT[EVT_TYPE] == EVT_QUIT {halt} }
+    while(get_event()) {
+		if EVT[EVT_TYPE] == EVT_QUIT {halt}
+		
+		if (EVT[EVT_TYPE] == EVT_BUTTONDOWN) || (EVT[EVT_TYPE] == EVT_BUTTONUP) {
+			if EVT[EVT_KEY] < 256 {keyboard[EVT[EVT_KEY]] = EVT[EVT_TYPE] == EVT_BUTTONDOWN}
+		}
+	}
+	
+	//Player input
+	if keyboard[KEY_LEFT] {player.rotY + 3}
+	if keyboard[KEY_RIGHT] {player.rotY - 3}
+	if keyboard[KEY_UP] {player.rotX + 3}
+	if keyboard[KEY_DOWN] {player.rotX - 3}
+	
+	$front = 0
+	if keyboard['w'] {$front + 1}
+	if keyboard['s'] {$front - 1}
+	$right = 0
+	if keyboard['d'] {$right + 1}
+	if keyboard['a'] {$right - 1}
+	
+	walkEntity(player, $front * 1.6, $right * 1.6)
+	
     frame()
 }
 
+remove(player)
+remove(keyboard)
 obj_remove(obj)
+
+fn walkEntity($entity, $front, $right) {
+	$sinv = sin($entity.rotY * M_PI / 180)
+	$cosv = cos($entity.rotY * M_PI / 180)
+	
+	if($front != 0 && $right != 0) {
+		//1 / (2^0.5) ~= 0.70710678
+		$front * 0.70710678
+		$right * 0.70710678
+	}
+	
+	$entity[0] + (-$sinv * $front + $cosv * $right)
+	$entity[2] + (-$cosv * $front - $sinv * $right)
+}
 
 //x,y,z - camera position;
 //r1 - rotation around the X-axis;
